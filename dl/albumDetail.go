@@ -141,10 +141,7 @@ func (a AlbumDetail) DownloadTrack() error {
 }
 
 func (a AlbumDetail) DownloadAll() error {
-	for index, audio := range a.audioList {
-		if index > 3 {
-			break
-		}
+	for _, audio := range a.audioList {
 		fileName := a.combineFileName(&audio)
 
 		if err := a.DownloadFile(audio.URL, fileName); err != nil {
