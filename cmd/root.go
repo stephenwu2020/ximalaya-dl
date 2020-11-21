@@ -11,6 +11,7 @@ import (
 var (
 	display bool
 	output  string
+	start   int
 )
 
 var rootCmd = &cobra.Command{
@@ -38,9 +39,12 @@ var rootCmd = &cobra.Command{
 			detail.SetOutput(output)
 		}
 
-		detail.Display()
+		if start != -1 {
+			detail.SetStart(start)
+		}
 
 		if display {
+			detail.Display()
 			return
 		}
 
@@ -61,6 +65,7 @@ func Execute() {
 func init() {
 	rootCmd.Flags().BoolVarP(&display, "display", "d", false, "Just display album info.")
 	rootCmd.Flags().StringVarP(&output, "output", "o", "", "output dir")
+	rootCmd.Flags().IntVarP(&start, "start", "", -1, "start num")
 }
 
 func example() string {

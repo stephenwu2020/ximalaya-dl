@@ -55,7 +55,7 @@ func GetVipAudioInfo(trackId int, cookie string) (ai AudioItem, err error) {
 
 //GetAudioInfo 获取音频信息
 func GetAudioInfo(albumID, page, pageSize int) (audioList []AudioItem, err error) {
-	format := fmt.Sprintf("https://m.ximalaya.com/m-revision/common/album/queryAlbumTrackRecordsByPage?albumId=%d&page=%d&pageSize=%d&asc=true", albumID, page, pageSize)
+	format := fmt.Sprintf("https://m.ximalaya.com/m-revision/common/album/queryAlbumTrackRecordsByPage?albumId=%d&page=%d&pageSize=%d&asc=false", albumID, page, pageSize)
 	log.Printf("Get: \u001B[1;33m%v\u001B[0m", format)
 
 	resp, err := client.Get(format)

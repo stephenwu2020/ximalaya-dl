@@ -25,12 +25,13 @@ type AlbumDetail struct {
 	pageCount  int
 	output     string
 	audioList  []AudioItem
+	start      int
 }
 
 var (
 	errFormat     = "\u001B[91m[%v]\u001B[0m 下载失败(第\u001B[32m%v\u001B[0m次重试) \u001B[36m%s\u001B[0m: %s"
 	maxRetryCount = 3
-	defaultDir    = "./downloads"
+	defaultDir    = "./"
 )
 
 func NewAlbumDetail(rawurl string) (*AlbumDetail, error) {
@@ -62,6 +63,7 @@ func NewAlbumDetail(rawurl string) (*AlbumDetail, error) {
 		rawurl:    rawurl,
 		parsedUrl: parsedUrl,
 		output:    defaultDir,
+		start:     -1,
 	}
 	return &detail, nil
 }
@@ -95,6 +97,10 @@ func (a *AlbumDetail) SetOutput(output string) {
 	a.output = output
 }
 
+func (a *AlbumDetail) SetStart(start int) {
+	a.start = start
+}
+
 func (a AlbumDetail) Display() {
 	fmt.Println("Album Info:")
 	fmt.Println("Id:", a.albumId)
@@ -114,10 +120,12 @@ func (a AlbumDetail) Display() {
 }
 
 func (a AlbumDetail) DownLoad() error {
-	if a.trackId == 0 {
-		return a.DownloadAll()
-	} else {
+	if a.trackId != 0 {
 		return a.DownloadTrack()
+	} else if a.start != -1 {
+		return a.DownloadAtStart()
+	} else {
+		return a.DownloadAll()
 	}
 }
 
@@ -142,6 +150,19 @@ func (a AlbumDetail) DownloadTrack() error {
 
 func (a AlbumDetail) DownloadAll() error {
 	for _, audio := range a.audioList {
+		fileName := a.combineFileName(&audio)
+
+		if err := a.DownloadFile(audio.URL, fileName); err != nil {
+			return errors.WithMessage(err, "Download list failed")
+		}
+	}
+	fmt.Println("Download finished.")
+	return nil
+}
+
+func (a AlbumDetail) DownloadAtStart() error {
+	for i := a.start; i < a.audioCount; i++ {
+		audio := a.audioList[i]
 		fileName := a.combineFileName(&audio)
 
 		if err := a.DownloadFile(audio.URL, fileName); err != nil {
