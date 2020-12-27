@@ -54,8 +54,8 @@ func GetVipAudioInfo(trackId int, cookie string) (ai AudioItem, err error) {
 }
 
 //GetAudioInfo 获取音频信息
-func GetAudioInfo(albumID, page, pageSize int) (audioList []AudioItem, err error) {
-	format := fmt.Sprintf("https://m.ximalaya.com/m-revision/common/album/queryAlbumTrackRecordsByPage?albumId=%d&page=%d&pageSize=%d&asc=true", albumID, page, pageSize)
+func GetAudioInfo(albumID, page, pageSize int, isAsc bool) (audioList []AudioItem, err error) {
+	format := fmt.Sprintf("https://m.ximalaya.com/m-revision/common/album/queryAlbumTrackRecordsByPage?albumId=%d&page=%d&pageSize=%d&asc=%t", albumID, page, pageSize, isAsc)
 	log.Printf("Get: \u001B[1;33m%v\u001B[0m", format)
 
 	resp, err := client.Get(format)
@@ -79,7 +79,7 @@ func GetAudioInfo(albumID, page, pageSize int) (audioList []AudioItem, err error
 }
 
 //GetAudioInfoList 获取音频信息列表
-func GetAudioInfoList(albumID, audioCount int) (audioList []AudioItem) {
+func GetAudioInfoList(albumID, audioCount int, asc bool) (audioList []AudioItem) {
 	number := audioCount / 100
 	j := audioCount % 100
 	if j > 0 {
@@ -87,7 +87,7 @@ func GetAudioInfoList(albumID, audioCount int) (audioList []AudioItem) {
 	}
 
 	for i := 1; i < number+1; i++ {
-		list, err := GetAudioInfo(albumID, i, 100)
+		list, err := GetAudioInfo(albumID, i, 100, asc)
 		if err != nil {
 			log.Println(err)
 			return audioList
@@ -137,10 +137,10 @@ func GetAlbumInfo(url string) (title string, audioCount, pageCount int, err erro
 }
 
 //GetAlbumInfoByMobileAPI 使用Mobile API获取专辑信息
-func GetAlbumInfoByMobileAPI(albumID int) error {
+func GetAlbumInfoByMobileAPI(albumID int, isAsc bool) error {
 	url := fmt.Sprintf(
-		"https://mobile.ximalaya.com/mobile/v1/album/track/ts-%d?ac=4G&albumID=%d&device=android&isAsc=true&pageId=%d&pageSize=200&pre_page=0&source=0&supportWebp=false",
-		time.Now().Unix(), albumID, 1)
+		"https://mobile.ximalaya.com/mobile/v1/album/track/ts-%d?ac=4G&albumID=%d&device=android&isAsc=%t&pageId=%d&pageSize=200&pre_page=0&source=0&supportWebp=false",
+		time.Now().Unix(), albumID, isAsc, 1)
 	resp, err := httpGet(url)
 	if err != nil {
 		return err
@@ -156,10 +156,10 @@ func GetAlbumInfoByMobileAPI(albumID int) error {
 }
 
 //使用 专辑ID & 页面ID 获取音频信息列表
-func GetAudioListByPageId(albumID, pageID int) (err error, ai *AudioInfoMobile) {
+func GetAudioListByPageId(albumID, pageID int, isAsc bool) (err error, ai *AudioInfoMobile) {
 	url := fmt.Sprintf(
-		"https://mobile.ximalaya.com/mobile/v1/album/track/ts-%d?ac=4G&albumID=%d&device=android&isAsc=true&pageID=%d&pageSize=200&pre_page=0&source=0&supportWebp=false",
-		time.Now().Unix(), albumID, pageID)
+		"https://mobile.ximalaya.com/mobile/v1/album/track/ts-%d?ac=4G&albumID=%d&device=android&isAsc=%t&pageID=%d&pageSize=200&pre_page=0&source=0&supportWebp=false",
+		time.Now().Unix(), albumID, isAsc, pageID)
 	resp, err := httpGet(url)
 	if err != nil {
 		return err, nil

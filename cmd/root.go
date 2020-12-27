@@ -12,6 +12,7 @@ var (
 	display bool
 	output  string
 	start   int
+	asc     bool
 )
 
 var rootCmd = &cobra.Command{
@@ -30,17 +31,19 @@ var rootCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		if err := detail.Fetch(); err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-
 		if output != "" {
 			detail.SetOutput(output)
 		}
 
 		if start != -1 {
 			detail.SetStart(start)
+		}
+
+		detail.SetAsc(asc)
+
+		if err := detail.Fetch(); err != nil {
+			fmt.Println(err)
+			os.Exit(1)
 		}
 
 		if display {
@@ -66,6 +69,7 @@ func init() {
 	rootCmd.Flags().BoolVarP(&display, "display", "d", false, "Just display album info.")
 	rootCmd.Flags().StringVarP(&output, "output", "o", "", "output dir")
 	rootCmd.Flags().IntVarP(&start, "start", "", -1, "start num")
+	rootCmd.Flags().BoolVarP(&asc, "asc", "", false, "if in asc order")
 }
 
 func example() string {

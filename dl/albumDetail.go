@@ -26,6 +26,7 @@ type AlbumDetail struct {
 	output     string
 	audioList  []AudioItem
 	start      int
+	asc        bool
 }
 
 var (
@@ -82,7 +83,7 @@ func (a *AlbumDetail) Fetch() error {
 	if err != nil {
 		return errors.WithMessage(err, "Parse album id failed")
 	}
-	audioList := GetAudioInfoList(albumId, audioCount)
+	audioList := GetAudioInfoList(albumId, audioCount, a.asc)
 
 	a.albumId = albumId
 	a.trackId = trackId
@@ -99,6 +100,10 @@ func (a *AlbumDetail) SetOutput(output string) {
 
 func (a *AlbumDetail) SetStart(start int) {
 	a.start = start
+}
+
+func (a *AlbumDetail) SetAsc(asc bool) {
+	a.asc = asc
 }
 
 func (a AlbumDetail) Display() {
